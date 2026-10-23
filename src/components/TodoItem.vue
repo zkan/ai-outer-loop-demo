@@ -14,11 +14,11 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <li class="todo-item" :class="{ done: todo.done }">
+  <li class="todo-item" :class="{ done: todo.completed }">
     <div class="checkbox-wrap">
       <input
         type="checkbox"
-        :checked="todo.done"
+        :checked="todo.completed"
         @change="emit('toggle', todo.id)"
       />
       <span class="checkbox-mark" aria-hidden="true">✓</span>
