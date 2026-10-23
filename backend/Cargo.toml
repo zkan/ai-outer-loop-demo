@@ -1,0 +1,14 @@
+[package]
+name = "outer-loop-todos-api"
+version = "0.1.0"
+edition = "2021"
+description = "REST API for the Outer Loop Todos demo"
+
+[dependencies]
+axum = { version = "0.8", features = ["macros"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+opt-level = 2
