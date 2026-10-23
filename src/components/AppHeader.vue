@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Stats from './Stats.vue'
+
 interface Props {
   completedCount: number
   totalCount: number

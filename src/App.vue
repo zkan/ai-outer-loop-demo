@@ -4,39 +4,54 @@ import AppHeader from './components/AppHeader.vue'
 import TodoInput from './components/TodoInput.vue'
 import TodoList from './components/TodoList.vue'
 import EmptyState from './components/EmptyState.vue'
-
-interface Todo {
-  id: string
-  text: string
-  done: boolean
-  createdAt: number
-}
+import { createTodo, deleteTodo, listTodos, updateTodo } from './api'
+import type { Todo } from './types'
 
 const todos = reactive<Todo[]>([])
-let idCounter = 0
+const error = ref<string | null>(null)
 
-const addTodo = (text: string) => {
+const loadTodos = async () => {
+  try {
+    error.value = null
+    todos.splice(0, todos.length, ...await listTodos())
+  } catch (e) {
+    error.value = (e as Error).message
+  }
+}
+
+const addTodo = async (text: string) => {
   const trimmed = text.trim()
   if (!trimmed) return
-  todos.push({
-    id: String(++idCounter),
-    text: trimmed,
-    done: false,
-    createdAt: Date.now(),
-  })
+  try {
+    const created = await createTodo({ text: trimmed })
+    todos.push(created)
+  } catch (e) {
+    error.value = (e as Error).message
+  }
 }
 
-const removeTodo = (id: string) => {
-  const idx = todos.findIndex((t) => t.id === id)
-  if (idx !== -1) todos.splice(idx, 1)
+const removeTodo = async (id: string) => {
+  try {
+    await deleteTodo(id)
+    const idx = todos.findIndex((t: Todo) => t.id === id)
+    if (idx !== -1) todos.splice(idx, 1)
+  } catch (e) {
+    error.value = (e as Error).message
+  }
 }
 
-const toggleTodo = (id: string) => {
-  const todo = todos.find((t) => t.id === id)
-  if (todo) todo.done = !todo.done
+const toggleTodo = async (id: string) => {
+  const todo = todos.find((t: Todo) => t.id === id)
+  if (!todo) return
+  try {
+    const updated = await updateTodo(id, { completed: !todo.completed })
+    Object.assign(todo, updated)
+  } catch (e) {
+    error.value = (e as Error).message
+  }
 }
 
-const completedCount = computed(() => todos.filter((t) => t.done).length)
+const completedCount = computed(() => todos.filter((t: Todo) => t.completed).length)
 const totalCount = computed(() => todos.length)
 
 const inputRef = ref<HTMLInputElement | null>(null)
@@ -44,6 +59,9 @@ const inputRef = ref<HTMLInputElement | null>(null)
 const focusInput = () => {
   inputRef.value?.focus()
 }
+
+// Seed the shell from the backend on first render.
+loadTodos()
 </script>
 
 <template>
@@ -51,6 +69,10 @@ const focusInput = () => {
     <AppHeader :completed-count="completedCount" :total-count="totalCount" />
     <main class="container">
       <section class="main">
+        <div class="error-banner" v-if="error">
+          <span class="error-icon" aria-hidden="true">!</span>
+          <span class="error-text">{{ error }}</span>
+        </div>
         <TodoInput ref="inputRef" @add="addTodo" />
         <TodoList :todos="todos" @toggle="toggleTodo" @remove="removeTodo" />
         <EmptyState
