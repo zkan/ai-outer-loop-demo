@@ -29,18 +29,24 @@ jobs:
         working-directory: backend
         run: cargo test --locked
 
-  # Frontend job: add beside `backend` when the Vue shell is covered by CI.
-  # It should stay independent so a backend failure and a UI failure report
-  # separately. Sketch:
-  #
-  # frontend:
-  #   name: Frontend
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 22
-  #         cache: npm
-  #     - run: npm ci
-  #     - run: npm run build
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
