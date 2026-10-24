@@ -1,36 +1,42 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 const emit = defineEmits<{
   add: [text: string]
 }>()
 
 const text = ref('')
-const input = ref<HTMLInputElement | null>(null)
+const input = ref<{ $el: HTMLInputElement } | null>(null)
 
 const submit = () => {
-  emit('add', text.value)
+  const value = text.value
+  if (!value.trim()) return
+  emit('add', value)
   text.value = ''
-  input.value?.focus()
+  focus()
 }
 
-const onKeydown = (e: KeyboardEvent) => {
-  if (e.key === 'Enter') submit()
+const focus = () => {
+  input.value?.$el?.focus()
 }
+
+defineExpose({ focus })
 </script>
 
 <template>
-  <div class="todo-input">
-    <input
+  <form class="flex items-center gap-2" @submit.prevent="submit">
+    <Input
       ref="input"
       v-model="text"
-      class="input"
+      class="h-10"
       placeholder="Add a new todo…"
       autocomplete="off"
-      @keydown="onKeydown"
+      aria-label="New todo"
     />
-    <button class="btn btn-primary" :disabled="!text.trim()" @click="submit">
+    <Button type="submit" class="h-10 px-4" :disabled="!text.trim()">
       Add
-    </button>
-  </div>
+    </Button>
+  </form>
 </template>
