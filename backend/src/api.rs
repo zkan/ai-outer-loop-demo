@@ -4,7 +4,7 @@ use axum::{
     extract::{rejection::JsonRejection, Path, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::{delete, get, patch, post},
+    routing::{get, patch},
     Json, Router,
 };
 
@@ -94,7 +94,7 @@ pub fn router(app_state: AppState) -> Router {
 }
 
 #[derive(Debug)]
-enum AppError {
+pub enum AppError {
     NotFound { message: String },
     BadRequest { message: String },
     Internal { message: String },
