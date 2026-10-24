@@ -21,3 +21,9 @@ npm-debug.log*
 # Rust build artifacts
 backend/target/
 target/
+
+# SQLite database created by the API
+*.db
+*.db-wal
+*.db-shm
+*.db-journal

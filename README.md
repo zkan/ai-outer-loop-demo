@@ -1,6 +1,6 @@
 # Outer Loop Todos
 
-A small to-do app. The interface is Vue 3 (Vite). The API is Rust (Axum) and stores todos in memory for the life of the process. You can create a todo, list them, toggle one complete, and delete one.
+A small to-do app. The interface is Vue 3 (Vite). The API is Rust (Axum) and stores todos in a SQLite file. You can create a todo, list them, toggle one complete, and delete one. Rows stay on disk across API restarts.
 
 The UI calls `/api` on its own origin. In development, Vite forwards `/api` to the Rust API.
 
@@ -76,6 +76,7 @@ Set these in the environment of the process you are starting. Defaults:
 | `API_PORT` | `3000` | Port the API binds to, and the port Vite proxies to. Integer from 1 to 65535. |
 | `FRONTEND_HOST` | `127.0.0.1` | Address the Vite dev server binds to. |
 | `FRONTEND_PORT` | `5173` | Port the Vite dev server binds to. Vite refuses to pick a different port if this one is taken. |
+| `DATABASE_PATH` | `todos.db` | SQLite file for the API. Relative paths are resolved from the API process working directory. `cd backend && cargo run` and `npm run dev:all` both use `backend/` as that directory, so the default file is `backend/todos.db`. The API creates the file and applies migrations on startup. |
 
 The browser keeps calling relative `/api/...`. To move the API, set `API_HOST` and `API_PORT` for both the API process and the Vite process. `npm run dev:all` exports the same values to both.
 
@@ -86,6 +87,12 @@ API_PORT=4000 FRONTEND_PORT=8080 npm run dev:all
 That serves the UI at http://127.0.0.1:8080 and the API at http://127.0.0.1:4000.
 
 When you start them separately, export the same `API_PORT` (and `API_HOST`, if you change it) in both terminals before `cargo run` and `npm run dev`.
+
+`DATABASE_PATH` is read only by the API process. `npm run dev:all` passes the variable through:
+
+```bash
+DATABASE_PATH=/tmp/outer-loop-todos.db npm run dev:all
+```
 
 ## Tests
 
@@ -122,6 +129,6 @@ npm run build
 
 **The first `cargo run` looks stuck.** Cargo is downloading crates and compiling. Wait for `AI Outer Loop todos API listening on http://...`. `npm run dev:all` waits up to 180 seconds for that port.
 
-**Todos disappear after a restart.** The API keeps them in memory only. Stopping the API process drops them. A browser refresh does not, as long as that same API process is still running.
+**Todos are still there after a restart.** They live in the SQLite file (`backend/todos.db` by default). A browser refresh reads that file. To start empty, stop the API and delete the file, or point `DATABASE_PATH` at a different path. Two API processes should not open the same file.
 
 **`npm ci` or `npm run build` fails on Node.** Use Node.js 22. The install command is `npm ci`, which requires `package-lock.json` and does not update it.
