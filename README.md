@@ -137,7 +137,7 @@ npm run build
 
 ### v0.1.0
 
-The first MVP release. Pull requests #1 and #3–#10 are merged into `main`. #2 duplicated the API work in #3 and was closed without merging.
+The first MVP release.
 
 - **API.** Built with Rust (Axum). `GET` and `POST /api/todos` list and create todos; `PATCH` and `DELETE /api/todos/{id}` update and delete them. Errors return `{ "error": string }`.
 - **Storage.** SQLite. Set `DATABASE_PATH` to choose the database file (default: `todos.db`, relative to the API process's working directory). On startup, the API applies the migrations in `backend/migrations/`.
