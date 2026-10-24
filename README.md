@@ -147,6 +147,7 @@ MVP. Pull requests #1 and #3–#9 are on `main`. #2 was a duplicate of the API i
 
 **Known limitations**
 
+- No authentication or sign-in, and no deployment setup yet.
 - Changing a todo's text is API-only. `PATCH` accepts `text`. The page sends `completed` on toggle.
 - `cargo build` still warns: unused `delete` and `post` imports in `backend/src/api.rs`, and `AppError` is private on the public handlers.
 - One API process per SQLite file. Two processes should not open the same path.
