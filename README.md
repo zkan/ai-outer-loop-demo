@@ -132,3 +132,21 @@ npm run build
 **Todos are still there after a restart.** They live in the SQLite file (`backend/todos.db` by default). A browser refresh reads that file. To start empty, stop the API and delete the file, or point `DATABASE_PATH` at a different path. Two API processes should not open the same file.
 
 **`npm ci` or `npm run build` fails on Node.** Use Node.js 22. The install command is `npm ci`, which requires `package-lock.json` and does not update it.
+
+## Release notes
+
+### v0.1.0
+
+MVP. Pull requests #1 and #3–#9 are on `main`. #2 was a duplicate of the API in #3 and was closed without merging.
+
+- **API.** Rust (Axum). `GET` and `POST /api/todos`, `PATCH` and `DELETE /api/todos/{id}`: create, list, update, and delete. Error responses are `{ "error": string }`.
+- **Storage.** SQLite. `DATABASE_PATH` selects the file (default `todos.db`, resolved from the API process working directory). Startup applies `backend/migrations/` and records them in `schema_migrations`. `createdAt` and `updatedAt` are UTC RFC3339 timestamps with milliseconds.
+- **UI.** Vue 3, Tailwind CSS, and shadcn-vue. Add a todo, mark it done, and delete it. All, Active, and Completed filters. The header shows completed/total. Dark mode follows the system theme until you toggle it; the toggle is remembered.
+- **Local run.** The Vite dev server proxies `/api` to the API. `npm run dev:all` runs `scripts/dev.sh`: it starts the API, waits until the API port accepts a connection, then starts Vite. Ctrl+C stops both.
+- **Tests and CI.** `cargo test --locked` covers the HTTP API, including rows that remain after the database is opened again. `npm test` runs Vitest (filters, the guard that keeps an in-flight add from being replaced by the initial list response, and empty-state focus). GitHub Actions runs Backend (`cargo build --locked`, `cargo test --locked`) and Frontend (`npm ci`, `npm run build`, `npm test`) on pull requests and on pushes to `main`.
+
+**Known limitations**
+
+- Changing a todo's text is API-only. `PATCH` accepts `text`. The page sends `completed` on toggle.
+- `cargo build` still warns: unused `delete` and `post` imports in `backend/src/api.rs`, and `AppError` is private on the public handlers.
+- One API process per SQLite file. Two processes should not open the same path.
