@@ -110,7 +110,7 @@ npm run build
 
 ## Troubleshooting
 
-**The page shows `Failed to fetch`.** Vite is up and the API is not, or the two processes are not using the same `API_HOST` and `API_PORT`. Start the API, wait for `listening on http://...`, then reload http://127.0.0.1:5173. With separate terminals, export the same `API_PORT` for both commands.
+**The page shows `Request failed (500)`.** Vite is up and cannot reach the API: the API process is stopped, or the two processes are not using the same `API_HOST` and `API_PORT`. The dev server answers `/api` with 500 in that case. Start the API, wait for `listening on http://...`, then reload the page. With separate terminals, export the same `API_PORT` for both commands.
 
 **`Address already in use` (API) or `Port 5173 is already in use` (Vite).** A previous API or Vite process is still bound. Stop it, or pick another port (`API_PORT`, `FRONTEND_PORT`) and use that port in the browser.
 
