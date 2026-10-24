@@ -12,6 +12,9 @@ use api::AppState;
 use axum::serve;
 use tokio::sync::Mutex;
 
+#[cfg(test)]
+mod http_tests;
+
 #[cfg(not(test))]
 #[tokio::main]
 async fn main() {
