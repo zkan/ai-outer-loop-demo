@@ -4,19 +4,15 @@ pub mod api;
 mod model;
 pub mod storage;
 
-use std::net::SocketAddr;
-
-use api::AppState;
-
-use axum::serve;
-
 #[cfg(test)]
 mod http_tests;
 
 /// Bind address for the API. `API_HOST` defaults to 127.0.0.1 (or the name
 /// `localhost`). `API_PORT` defaults to 3000.
 #[cfg(not(test))]
-fn listen_addr() -> SocketAddr {
+fn listen_addr() -> std::net::SocketAddr {
+    use std::net::SocketAddr;
+
     let host = std::env::var("API_HOST").unwrap_or_else(|_| "127.0.0.1".to_string());
     let port_raw = std::env::var("API_PORT").unwrap_or_else(|_| "3000".to_string());
     let port: u16 = match port_raw.parse() {
@@ -43,6 +39,9 @@ fn listen_addr() -> SocketAddr {
 #[cfg(not(test))]
 #[tokio::main]
 async fn main() {
+    use api::AppState;
+    use axum::serve;
+
     let db_path = std::env::var("DATABASE_PATH").unwrap_or_else(|_| "todos.db".to_string());
     let todos = match storage::Todos::connect(&db_path).await {
         Ok(todos) => todos,
