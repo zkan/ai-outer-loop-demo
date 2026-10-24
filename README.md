@@ -137,17 +137,16 @@ npm run build
 
 ### v0.1.0
 
-MVP. Pull requests #1 and #3–#9 are on `main`. #2 was a duplicate of the API in #3 and was closed without merging.
+The first MVP release. Pull requests #1 and #3–#9 are merged into `main`. #2 duplicated the API work in #3 and was closed without merging.
 
-- **API.** Rust (Axum). `GET` and `POST /api/todos`, `PATCH` and `DELETE /api/todos/{id}`: create, list, update, and delete. Error responses are `{ "error": string }`.
-- **Storage.** SQLite. `DATABASE_PATH` selects the file (default `todos.db`, resolved from the API process working directory). Startup applies `backend/migrations/` and records them in `schema_migrations`. `createdAt` and `updatedAt` are UTC RFC3339 timestamps with milliseconds.
-- **UI.** Vue 3, Tailwind CSS, and shadcn-vue. Add a todo, mark it done, and delete it. All, Active, and Completed filters. The header shows completed/total. Dark mode follows the system theme until you toggle it; the toggle is remembered.
-- **Local run.** The Vite dev server proxies `/api` to the API. `npm run dev:all` runs `scripts/dev.sh`: it starts the API, waits until the API port accepts a connection, then starts Vite. Ctrl+C stops both.
-- **Tests and CI.** `cargo test --locked` covers the HTTP API, including rows that remain after the database is opened again. `npm test` runs Vitest (filters, the guard that keeps an in-flight add from being replaced by the initial list response, and empty-state focus). GitHub Actions runs Backend (`cargo build --locked`, `cargo test --locked`) and Frontend (`npm ci`, `npm run build`, `npm test`) on pull requests and on pushes to `main`.
+- **API.** Built with Rust (Axum). `GET` and `POST /api/todos` list and create todos; `PATCH` and `DELETE /api/todos/{id}` update and delete them. Errors return `{ "error": string }`.
+- **Storage.** SQLite. Set `DATABASE_PATH` to choose the database file (default: `todos.db`, relative to the API process's working directory). On startup, the API applies the migrations in `backend/migrations/`.
+- **UI.** Built with Vue 3, Tailwind CSS, and shadcn-vue. You can add a todo, mark it done, and delete it, and filter by All, Active, or Completed. The header shows completed/total. Dark mode follows your system theme until you toggle it, and the app remembers your choice.
+- **Local development.** The Vite dev server proxies `/api` to the API. `npm run dev:all` runs `scripts/dev.sh`, which starts the API, waits until its port accepts connections, and then starts Vite. Press Ctrl+C to stop both.
+- **Tests and CI.** `cargo test --locked` covers the HTTP API, including data that persists after the database is reopened. `npm test` runs Vitest, covering the filters and the empty-state focus. GitHub Actions runs the Backend job (`cargo build --locked`, `cargo test --locked`) and the Frontend job (`npm ci`, `npm run build`, `npm test`) on pull requests and on pushes to `main`.
 
 **Known limitations**
 
-- No authentication or sign-in, and no deployment setup yet.
-- Changing a todo's text is API-only. `PATCH` accepts `text`. The page sends `completed` on toggle.
-- `cargo build` still warns: unused `delete` and `post` imports in `backend/src/api.rs`, and `AppError` is private on the public handlers.
-- One API process per SQLite file. Two processes should not open the same path.
+- No authentication and no deployment setup yet.
+- You can edit a todo's text only through the API: `PATCH` accepts `text`, but the UI only sends `completed` when you toggle a todo.
+- Run only one API process per SQLite file. Don't point two processes at the same path.
