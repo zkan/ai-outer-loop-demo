@@ -5,12 +5,10 @@ mod model;
 pub mod storage;
 
 use std::net::SocketAddr;
-use std::sync::Arc;
 
 use api::AppState;
 
 use axum::serve;
-use tokio::sync::Mutex;
 
 #[cfg(test)]
 mod http_tests;
@@ -45,11 +43,19 @@ fn listen_addr() -> SocketAddr {
 #[cfg(not(test))]
 #[tokio::main]
 async fn main() {
-    let todos = Arc::new(Mutex::new(storage::Todos::new()));
+    let db_path = std::env::var("DATABASE_PATH").unwrap_or_else(|_| "todos.db".to_string());
+    let todos = match storage::Todos::connect(&db_path).await {
+        Ok(todos) => todos,
+        Err(err) => {
+            eprintln!("failed to open database at {db_path}: {err}");
+            std::process::exit(1);
+        }
+    };
     let app = api::router(AppState { todos });
 
     let addr = listen_addr();
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    println!("AI Outer Loop todos database at {db_path}");
     println!("AI Outer Loop todos API listening on http://{addr}");
     serve(listener, app).await.unwrap();
 }
