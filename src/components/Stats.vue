@@ -1,11 +1,14 @@
 <script setup lang="ts">
-interface Props {
+import { Badge } from '@/components/ui/badge'
+
+defineProps<{
   completed: number
   total: number
-}
-const props = defineProps<Props>()
+}>()
 </script>
 
 <template>
-  <span class="stats">{{ props.completed }}/{{ props.total }}</span>
+  <Badge variant="secondary" class="h-7 px-2.5 text-xs tabular-nums">
+    {{ completed }}/{{ total }} done
+  </Badge>
 </template>

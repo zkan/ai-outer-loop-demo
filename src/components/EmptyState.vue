@@ -1,22 +1,39 @@
 <script setup lang="ts">
-interface Props {
-  message?: string
+import { ListTodoIcon } from '@lucide/vue'
+import { Button } from '@/components/ui/button'
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
+
+defineProps<{
+  title: string
+  description: string
   actionLabel?: string
-  onAction?: () => void
-}
-const props = defineProps<Props>()
+}>()
+
+const emit = defineEmits<{
+  action: []
+}>()
 </script>
 
 <template>
-  <div class="empty-state">
-    <p class="empty-icon" aria-hidden="true">▢</p>
-    <p class="empty-message">{{ message }}</p>
-    <button
-      v-if="actionLabel && onAction"
-      class="btn btn-primary empty-cta"
-      @click="props.onAction"
-    >
-      {{ actionLabel }}
-    </button>
-  </div>
+  <Empty class="border bg-muted/30 py-10">
+    <EmptyHeader>
+      <EmptyMedia variant="icon">
+        <ListTodoIcon />
+      </EmptyMedia>
+      <EmptyTitle>{{ title }}</EmptyTitle>
+      <EmptyDescription>{{ description }}</EmptyDescription>
+    </EmptyHeader>
+    <EmptyContent v-if="actionLabel">
+      <Button variant="outline" @click="emit('action')">
+        {{ actionLabel }}
+      </Button>
+    </EmptyContent>
+  </Empty>
 </template>

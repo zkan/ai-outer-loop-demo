@@ -1,3 +1,5 @@
+import path from 'node:path'
+import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
@@ -22,7 +24,12 @@ export default defineConfig(({ mode }) => {
   const targetHost = apiHost.includes(':') ? `[${apiHost}]` : apiHost
 
   return {
-    plugins: [vue()],
+    plugins: [vue(), tailwindcss()],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
+    },
     server: {
       host: frontendHost,
       port: frontendPort,

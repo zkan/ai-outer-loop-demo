@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import TodoItem from './TodoItem.vue'
-import type { Todo } from '../types'
+import type { Todo } from '@/types'
 
-interface Props {
+defineProps<{
   todos: Todo[]
-}
+}>()
 
-const { todos } = defineProps<Props>()
 const emit = defineEmits<{
   toggle: [id: string]
   remove: [id: string]
@@ -14,11 +13,11 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <ul class="todo-list">
+  <ul class="flex flex-col gap-2">
     <TodoItem
       v-for="todo in todos"
-      :todo="todo"
       :key="todo.id"
+      :todo="todo"
       @toggle="emit('toggle', todo.id)"
       @remove="emit('remove', todo.id)"
     />

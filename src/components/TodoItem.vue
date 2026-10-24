@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import type { Todo } from '../types'
+import { Trash2Icon } from '@lucide/vue'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import type { Todo } from '@/types'
 
-interface Props {
+defineProps<{
   todo: Todo
-}
-
-const { todo } = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   toggle: [id: string]
@@ -14,18 +15,25 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <li class="todo-item" :class="{ done: todo.completed }">
-    <div class="checkbox-wrap">
-      <input
-        type="checkbox"
-        :checked="todo.completed"
-        @change="emit('toggle', todo.id)"
-      />
-      <span class="checkbox-mark" aria-hidden="true">✓</span>
-    </div>
-    <span class="todo-text">{{ todo.text }}</span>
-    <button class="icon-btn" aria-label="Delete todo" @click="emit('remove', todo.id)">
-      ×
-    </button>
+  <li class="bg-card flex items-center gap-3 rounded-lg border px-3 py-2.5">
+    <Checkbox
+      :model-value="todo.completed"
+      :aria-label="todo.completed ? 'Mark as not done' : 'Mark as done'"
+      @update:model-value="emit('toggle', todo.id)"
+    />
+    <span
+      class="min-w-0 flex-1 text-sm leading-6"
+      :class="todo.completed ? 'text-muted-foreground line-through' : 'text-foreground'"
+    >
+      {{ todo.text }}
+    </span>
+    <Button
+      variant="ghost"
+      size="icon"
+      aria-label="Delete todo"
+      @click="emit('remove', todo.id)"
+    >
+      <Trash2Icon />
+    </Button>
   </li>
 </template>

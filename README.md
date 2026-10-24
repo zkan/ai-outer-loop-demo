@@ -109,7 +109,7 @@ UI, from the repo root:
 npm test
 ```
 
-There are no frontend unit tests yet. `npm test` runs Node's test runner (`node --test`) and succeeds with zero tests. `npm run build` typechecks the Vue app and writes `dist/`.
+`npm test` runs the Vitest suite: todo filters, the guard that keeps an in-flight add from being wiped by the initial list request, and focusing the input from the empty state. `npm run build` typechecks the Vue app and writes `dist/`.
 
 ```bash
 npm run build
