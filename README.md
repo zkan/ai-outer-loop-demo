@@ -132,3 +132,21 @@ npm run build
 **Todos are still there after a restart.** They live in the SQLite file (`backend/todos.db` by default). A browser refresh reads that file. To start empty, stop the API and delete the file, or point `DATABASE_PATH` at a different path. Two API processes should not open the same file.
 
 **`npm ci` or `npm run build` fails on Node.** Use Node.js 22. The install command is `npm ci`, which requires `package-lock.json` and does not update it.
+
+## Release notes
+
+### v0.1.0
+
+The first MVP release. Pull requests #1 and #3–#9 are merged into `main`. #2 duplicated the API work in #3 and was closed without merging.
+
+- **API.** Built with Rust (Axum). `GET` and `POST /api/todos` list and create todos; `PATCH` and `DELETE /api/todos/{id}` update and delete them. Errors return `{ "error": string }`.
+- **Storage.** SQLite. Set `DATABASE_PATH` to choose the database file (default: `todos.db`, relative to the API process's working directory). On startup, the API applies the migrations in `backend/migrations/`.
+- **UI.** Built with Vue 3, Tailwind CSS, and shadcn-vue. You can add a todo, mark it done, and delete it, and filter by All, Active, or Completed. The header shows completed/total. Dark mode follows your system theme until you toggle it, and the app remembers your choice.
+- **Local development.** The Vite dev server proxies `/api` to the API. `npm run dev:all` runs `scripts/dev.sh`, which starts the API, waits until its port accepts connections, and then starts Vite. Press Ctrl+C to stop both.
+- **Tests and CI.** `cargo test --locked` covers the HTTP API, including data that persists after the database is reopened. `npm test` runs Vitest, covering the filters and the empty-state focus. GitHub Actions runs the Backend job (`cargo build --locked`, `cargo test --locked`) and the Frontend job (`npm ci`, `npm run build`, `npm test`) on pull requests and on pushes to `main`.
+
+**Known limitations**
+
+- No authentication and no deployment setup yet.
+- You can edit a todo's text only through the API: `PATCH` accepts `text`, but the UI only sends `completed` when you toggle a todo.
+- Run only one API process per SQLite file. Don't point two processes at the same path.
